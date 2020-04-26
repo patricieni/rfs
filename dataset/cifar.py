@@ -12,9 +12,15 @@ from torch.utils.data import Dataset
 
 class CIFAR100(Dataset):
     """support FC100 and CIFAR-FS"""
-    def __init__(self, args, partition='train', pretrain=True, is_sample=False, k=4096,
+
+    def __init__(self,
+                 args,
+                 partition='train',
+                 pretrain=True,
+                 is_sample=False,
+                 k=4096,
                  transform=None):
-        super(Dataset, self).__init__()
+        super(CIFAR100, self).__init__()
         self.data_root = args.data_root
         self.partition = partition
         self.data_aug = args.data_aug
@@ -28,17 +34,16 @@ class CIFAR100(Dataset):
                 self.transform = transforms.Compose([
                     lambda x: Image.fromarray(x),
                     transforms.RandomCrop(32, padding=4),
-                    transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4),
-                    transforms.RandomHorizontalFlip(),
-                    lambda x: np.asarray(x),
-                    transforms.ToTensor(),
-                    self.normalize
+                    transforms.ColorJitter(brightness=0.4,
+                                           contrast=0.4,
+                                           saturation=0.4),
+                    transforms.RandomHorizontalFlip(), lambda x: np.asarray(x),
+                    transforms.ToTensor(), self.normalize
                 ])
             else:
                 self.transform = transforms.Compose([
                     lambda x: Image.fromarray(x),
-                    transforms.ToTensor(),
-                    self.normalize
+                    transforms.ToTensor(), self.normalize
                 ])
         else:
             self.transform = transform
@@ -49,7 +54,8 @@ class CIFAR100(Dataset):
             self.file_pattern = '%s.pickle'
         self.data = {}
 
-        with open(os.path.join(self.data_root, self.file_pattern % partition), 'rb') as f:
+        with open(os.path.join(self.data_root, self.file_pattern % partition),
+                  'rb') as f:
             data = pickle.load(f, encoding='latin1')
             self.imgs = data['data']
             labels = data['labels']
@@ -84,8 +90,12 @@ class CIFAR100(Dataset):
                         continue
                     self.cls_negative[i].extend(self.cls_positive[j])
 
-            self.cls_positive = [np.asarray(self.cls_positive[i]) for i in range(num_classes)]
-            self.cls_negative = [np.asarray(self.cls_negative[i]) for i in range(num_classes)]
+            self.cls_positive = [
+                np.asarray(self.cls_positive[i]) for i in range(num_classes)
+            ]
+            self.cls_negative = [
+                np.asarray(self.cls_negative[i]) for i in range(num_classes)
+            ]
             self.cls_positive = np.asarray(self.cls_positive)
             self.cls_negative = np.asarray(self.cls_negative)
 
@@ -98,8 +108,11 @@ class CIFAR100(Dataset):
             return img, target, item
         else:
             pos_idx = item
-            replace = True if self.k > len(self.cls_negative[target]) else False
-            neg_idx = np.random.choice(self.cls_negative[target], self.k, replace=replace)
+            replace = True if self.k > len(
+                self.cls_negative[target]) else False
+            neg_idx = np.random.choice(self.cls_negative[target],
+                                       self.k,
+                                       replace=replace)
             sample_idx = np.hstack((np.asarray([pos_idx]), neg_idx))
             return img, target, item, sample_idx
 
@@ -108,8 +121,12 @@ class CIFAR100(Dataset):
 
 
 class MetaCIFAR100(CIFAR100):
-
-    def __init__(self, args, partition='train', train_transform=None, test_transform=None, fix_seed=True):
+    def __init__(self,
+                 args,
+                 partition='train',
+                 train_transform=None,
+                 test_transform=None,
+                 fix_seed=True):
         super(MetaCIFAR100, self).__init__(args, partition, False)
         self.fix_seed = fix_seed
         self.n_ways = args.n_ways
@@ -122,11 +139,11 @@ class MetaCIFAR100(CIFAR100):
             self.train_transform = transforms.Compose([
                 lambda x: Image.fromarray(x),
                 transforms.RandomCrop(32, padding=4),
-                transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4),
-                transforms.RandomHorizontalFlip(),
-                lambda x: np.asarray(x),
-                transforms.ToTensor(),
-                self.normalize
+                transforms.ColorJitter(brightness=0.4,
+                                       contrast=0.4,
+                                       saturation=0.4),
+                transforms.RandomHorizontalFlip(), lambda x: np.asarray(x),
+                transforms.ToTensor(), self.normalize
             ])
         else:
             self.train_transform = train_transform
@@ -134,8 +151,7 @@ class MetaCIFAR100(CIFAR100):
         if test_transform is None:
             self.test_transform = transforms.Compose([
                 lambda x: Image.fromarray(x),
-                transforms.ToTensor(),
-                self.normalize
+                transforms.ToTensor(), self.normalize
             ])
         else:
             self.test_transform = test_transform
@@ -157,29 +173,38 @@ class MetaCIFAR100(CIFAR100):
         query_ys = []
         for idx, cls in enumerate(cls_sampled):
             imgs = np.asarray(self.data[cls]).astype('uint8')
-            support_xs_ids_sampled = np.random.choice(range(imgs.shape[0]), self.n_shots, False)
+            support_xs_ids_sampled = np.random.choice(range(imgs.shape[0]),
+                                                      self.n_shots, False)
             support_xs.append(imgs[support_xs_ids_sampled])
             support_ys.append([idx] * self.n_shots)
-            query_xs_ids = np.setxor1d(np.arange(imgs.shape[0]), support_xs_ids_sampled)
-            query_xs_ids = np.random.choice(query_xs_ids, self.n_queries, False)
+            query_xs_ids = np.setxor1d(np.arange(imgs.shape[0]),
+                                       support_xs_ids_sampled)
+            query_xs_ids = np.random.choice(query_xs_ids, self.n_queries,
+                                            False)
             query_xs.append(imgs[query_xs_ids])
             query_ys.append([idx] * query_xs_ids.shape[0])
-        support_xs, support_ys, query_xs, query_ys = np.array(support_xs), np.array(support_ys), np.array(
-            query_xs), np.array(query_ys)
+        support_xs, support_ys, query_xs, query_ys = np.array(
+            support_xs), np.array(support_ys), np.array(query_xs), np.array(
+                query_ys)
         num_ways, n_queries_per_way, height, width, channel = query_xs.shape
-        query_xs = query_xs.reshape((num_ways * n_queries_per_way, height, width, channel))
-        query_ys = query_ys.reshape((num_ways * n_queries_per_way,))
+        query_xs = query_xs.reshape(
+            (num_ways * n_queries_per_way, height, width, channel))
+        query_ys = query_ys.reshape((num_ways * n_queries_per_way, ))
 
         support_xs = support_xs.reshape((-1, height, width, channel))
         if self.n_aug_support_samples > 1:
-            support_xs = np.tile(support_xs, (self.n_aug_support_samples, 1, 1, 1))
-            support_ys = np.tile(support_ys.reshape((-1,)), (self.n_aug_support_samples))
+            support_xs = np.tile(support_xs,
+                                 (self.n_aug_support_samples, 1, 1, 1))
+            support_ys = np.tile(support_ys.reshape((-1, )),
+                                 (self.n_aug_support_samples))
         support_xs = np.split(support_xs, support_xs.shape[0], axis=0)
         query_xs = query_xs.reshape((-1, height, width, channel))
         query_xs = np.split(query_xs, query_xs.shape[0], axis=0)
 
-        support_xs = torch.stack(list(map(lambda x: self.train_transform(x.squeeze()), support_xs)))
-        query_xs = torch.stack(list(map(lambda x: self.test_transform(x.squeeze()), query_xs)))
+        support_xs = torch.stack(
+            list(map(lambda x: self.train_transform(x.squeeze()), support_xs)))
+        query_xs = torch.stack(
+            list(map(lambda x: self.test_transform(x.squeeze()), query_xs)))
 
         return support_xs, support_ys, query_xs, query_ys
 

@@ -10,7 +10,7 @@ import torchvision.transforms as transforms
 class TieredImageNet(Dataset):
     def __init__(self, args, partition='train', pretrain=True, is_sample=False, k=4096,
                  transform=None):
-        super(Dataset, self).__init__()
+        super(TieredImageNet, self).__init__()
         self.data_root = args.data_root
         self.partition = partition
         self.data_aug = args.data_aug
