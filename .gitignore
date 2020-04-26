@@ -9,9 +9,11 @@ ckpts/
 tmp*.py
 # run*.sh
 *.pdf
-models_distilled/
-tensorboard/
-models_pretrained/
+results/models_distilled/
+results/tensorboard/
+results/models_pretrained/
+
+dataset/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
