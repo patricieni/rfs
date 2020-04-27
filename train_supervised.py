@@ -28,7 +28,7 @@ from eval.cls_eval import validate
 
 def parse_option():
 
-    parent_dir = "/Users/patricfulop/Documents/Code/RFS"
+    parent_dir = "/afs/inf.ed.ac.uk/user/s10/s1043702/RFS"
     parser = argparse.ArgumentParser('argument for training')
 
     parser.add_argument('--eval_freq',
