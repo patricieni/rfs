@@ -385,15 +385,15 @@ def main():
         time2 = time.time()
         print('epoch {}, total time {:.2f}'.format(epoch, time2 - time1))
 
-        logger.add_scalar('train_acc', train_acc.item(), epoch)
-        logger.add_scalar('train_loss', train_loss.item(), epoch)
+        logger.add_scalar('train_acc', train_acc, epoch)
+        logger.add_scalar('train_loss', train_loss, epoch)
 
         test_acc, test_acc_top5, test_loss = validate(val_loader, model,
                                                       criterion, opt)
 
-        logger.add_scalar('test_acc', test_acc.item(), epoch)
-        logger.add_scalar('test_acc_top5', test_acc_top5.item(), epoch)
-        logger.add_scalar('test_loss', test_loss.item(), epoch)
+        logger.add_scalar('test_acc', test_acc, epoch)
+        logger.add_scalar('test_acc_top5', test_acc_top5, epoch)
+        logger.add_scalar('test_loss', test_loss, epoch)
 
         # regular saving
         if epoch % opt.save_freq == 0:
@@ -436,6 +436,8 @@ def train(epoch, train_loader, model, criterion, optimizer, opt):
     for idx, (input, target, _) in enumerate(train_loader):
         data_time.update(time.time() - end)
 
+        print(target.shape)
+        print(input.shape)
         input = input.float()
         if torch.cuda.is_available():
             input = input.cuda()
@@ -460,7 +462,6 @@ def train(epoch, train_loader, model, criterion, optimizer, opt):
         end = time.time()
 
         # tensorboard logger
-        pass
 
         # print info
         if idx % opt.print_freq == 0:
