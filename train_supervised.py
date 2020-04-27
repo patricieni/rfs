@@ -436,8 +436,6 @@ def train(epoch, train_loader, model, criterion, optimizer, opt):
     for idx, (input, target, _) in enumerate(train_loader):
         data_time.update(time.time() - end)
 
-        print(target.shape)
-        print(input.shape)
         input = input.float()
         if torch.cuda.is_available():
             input = input.cuda()
@@ -463,6 +461,7 @@ def train(epoch, train_loader, model, criterion, optimizer, opt):
 
         # tensorboard logger
 
+        print("Entering last batch of epoch")
         # print info
         if idx % opt.print_freq == 0:
             print('Epoch: [{0}][{1}/{2}]\t'
@@ -481,8 +480,8 @@ def train(epoch, train_loader, model, criterion, optimizer, opt):
                       top5=top5))
             sys.stdout.flush()
 
-    print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'.format(top1=top1,
-                                                                top5=top5))
+    print('* Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'.format(top1=top1,
+                                                               top5=top5))
 
     return top1.avg, losses.avg
 
