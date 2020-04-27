@@ -436,6 +436,10 @@ def train(epoch, train_loader, model, criterion, optimizer, opt):
     for idx, (input, target, _) in enumerate(train_loader):
         data_time.update(time.time() - end)
 
+        if idx % opt.print_freq == 1:
+            print(
+                "Starting last big batch there's an issue with tensor-->numpy conversion"
+            )
         input = input.float()
         if torch.cuda.is_available():
             input = input.cuda()
@@ -443,12 +447,15 @@ def train(epoch, train_loader, model, criterion, optimizer, opt):
 
         # ===================forward=====================
         output = model(input)
+        if idx % opt.print_freq == 1:
+            print("Error is between forward and loss compute")
         loss = criterion(output, target)
-
-        acc1, acc5 = accuracy(output, target, topk=(1, 5))
+        if idx % opt.print_freq == 1:
+            print("Error is after loss computation but before accuracy")
+        acc = accuracy(output, target, topk=(1, 5))
         losses.update(loss.item(), input.size(0))
-        top1.update(acc1[0], input.size(0))
-        top5.update(acc5[0], input.size(0))
+        top1.update(acc[0][0], input.size(0))
+        top5.update(acc[1][0], input.size(0))
 
         # ===================backward=====================
         optimizer.zero_grad()
