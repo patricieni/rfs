@@ -461,9 +461,9 @@ def train(epoch, train_loader, model, criterion, optimizer, opt):
 
         # tensorboard logger
 
-        print("Entering last batch of epoch")
         # print info
         if idx % opt.print_freq == 0:
+            print("Entering last batch of epoch")
             print('Epoch: [{0}][{1}/{2}]\t'
                   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                   'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
