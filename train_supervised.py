@@ -385,15 +385,15 @@ def main():
         time2 = time.time()
         print('epoch {}, total time {:.2f}'.format(epoch, time2 - time1))
 
-        logger.add_scalar('train_acc', train_acc, epoch)
-        logger.add_scalar('train_loss', train_loss, epoch)
+        logger.add_scalar('train_acc', train_acc.item(), epoch)
+        logger.add_scalar('train_loss', train_loss.item(), epoch)
 
         test_acc, test_acc_top5, test_loss = validate(val_loader, model,
                                                       criterion, opt)
 
-        logger.add_scalar('test_acc', test_acc, epoch)
-        logger.add_scalar('test_acc_top5', test_acc_top5, epoch)
-        logger.add_scalar('test_loss', test_loss, epoch)
+        logger.add_scalar('test_acc', test_acc.item(), epoch)
+        logger.add_scalar('test_acc_top5', test_acc_top5.item(), epoch)
+        logger.add_scalar('test_loss', test_loss.item(), epoch)
 
         # regular saving
         if epoch % opt.save_freq == 0:
