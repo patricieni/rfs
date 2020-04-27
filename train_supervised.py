@@ -211,7 +211,7 @@ def parse_option():
 def main():
 
     opt = parse_option()
-    parent_dir = "/Users/patricfulop/Documents/Code/RFS"
+    parent_dir = "/afs/inf.ed.ac.uk/user/s10/s1043702/RFS"
 
     # dataloader
     train_partition = 'trainval' if opt.use_trainval else 'train'
