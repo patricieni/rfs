@@ -28,7 +28,7 @@ from eval.cls_eval import validate
 
 def parse_option():
 
-    parent_dir = os.getcwd()
+    #parent_dir = os.getcwd()
     parser = argparse.ArgumentParser('argument for training')
 
     parser.add_argument('--eval_freq',
@@ -194,12 +194,12 @@ def parse_option():
 
     opt.model_name = '{}_trial_{}'.format(opt.model_name, opt.trial)
 
-    opt.tb_folder = os.path.join(parent_dir, opt.tb_path, opt.model_name)
+    opt.tb_folder = os.path.join(opt.tb_path, opt.model_name)
     print("Tensorboard folder: {0}".format(opt.tb_folder))
     if not os.path.isdir(opt.tb_folder):
         os.mkdir(opt.tb_folder)
 
-    opt.save_folder = os.path.join(parent_dir, opt.model_path, opt.model_name)
+    opt.save_folder = os.path.join(opt.model_path, opt.model_name)
     if not os.path.isdir(opt.save_folder):
         os.mkdir(opt.save_folder)
 
@@ -212,8 +212,8 @@ def parse_option():
 def main():
 
     opt = parse_option()
-    parent_dir = os.getcwd()
-    print(parent_dir)
+    #parent_dir = os.getcwd()
+    #print(parent_dir)
 
     # dataloader
     train_partition = 'trainval' if opt.use_trainval else 'train'
@@ -408,8 +408,7 @@ def main():
                 if opt.n_gpu <= 1 else model.module.state_dict(),
             }
             save_file = os.path.join(
-                parent_dir, opt.save_folder,
-                'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
+                opt.save_folder, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
             torch.save(state, save_file)
 
     # save the last model
@@ -419,8 +418,7 @@ def main():
         'model':
         model.state_dict() if opt.n_gpu <= 1 else model.module.state_dict(),
     }
-    save_file = os.path.join(parent_dir, opt.save_folder,
-                             '{}_last.pth'.format(opt.model))
+    save_file = os.path.join(opt.save_folder, '{}_last.pth'.format(opt.model))
     torch.save(state, save_file)
 
 
