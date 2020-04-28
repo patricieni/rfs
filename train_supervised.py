@@ -6,7 +6,9 @@ import socket
 import time
 import sys
 
-from torch.utils.tensorboard import SummaryWriter
+#from torch.utils.tensorboard import SummaryWriter
+import wandb
+wandb.init(project="meta-learning")
 import torch
 import torch.optim as optim
 import torch.nn as nn
@@ -110,10 +112,10 @@ def parse_option():
                         type=str,
                         default='',
                         help='path to save model')
-    parser.add_argument('--tb_path',
-                        type=str,
-                        default='',
-                        help='path to tensorboard')
+    #parser.add_argument('--tb_path',
+    #                    type=str,
+    #                    default='',
+    #                    help='path to tensorboard')
     parser.add_argument('--data_root',
                         type=str,
                         default='',
@@ -169,8 +171,8 @@ def parse_option():
     # set the path according to the environment
     if not opt.model_path:
         opt.model_path = './models_pretrained'
-    if not opt.tb_path:
-        opt.tb_path = './tensorboard'
+    #if not opt.tb_path:
+    #    opt.tb_path = './tensorboard'
     if not opt.data_root:
         opt.data_root = './data/{}'.format(opt.dataset)
     else:
@@ -194,10 +196,10 @@ def parse_option():
 
     opt.model_name = '{}_trial_{}'.format(opt.model_name, opt.trial)
 
-    opt.tb_folder = os.path.join(opt.tb_path, opt.model_name)
-    print("Tensorboard folder: {0}".format(opt.tb_folder))
-    if not os.path.isdir(opt.tb_folder):
-        os.mkdir(opt.tb_folder)
+    #opt.tb_folder = os.path.join(opt.tb_path, opt.model_name)
+    #print("Tensorboard folder: {0}".format(opt.tb_folder))
+    #if not os.path.isdir(opt.tb_folder):
+    #    os.mkdir(opt.tb_folder)
 
     opt.save_folder = os.path.join(opt.model_path, opt.model_name)
     if not os.path.isdir(opt.save_folder):
@@ -364,7 +366,8 @@ def main():
         cudnn.benchmark = True
 
     # tensorboard
-    logger = SummaryWriter(log_dir=opt.tb_folder, flush_secs=2)
+    #logger = SummaryWriter(log_dir=opt.tb_folder, flush_secs=2)
+    wandb.watch(model)
 
     # set cosine annealing scheduler
     if opt.cosine:
@@ -387,15 +390,19 @@ def main():
         time2 = time.time()
         print('epoch {}, total time {:.2f}'.format(epoch, time2 - time1))
 
-        logger.add_scalar('train_acc', train_acc, epoch)
-        logger.add_scalar('train_loss', train_loss, epoch)
+        #logger.add_scalar('train_loss', train_loss, epoch)
 
         test_acc, test_acc_top5, test_loss = validate(val_loader, model,
                                                       criterion, opt)
 
-        logger.add_scalar('test_acc', test_acc, epoch)
-        logger.add_scalar('test_acc_top5', test_acc_top5, epoch)
-        logger.add_scalar('test_loss', test_loss, epoch)
+        wandb.log({"Train Loss": train_loss, "Test Loss": test_loss})
+        wandb.log({
+            "Test Accuracy": test_acc,
+            "Test Accuracy Top 5": test_acc_top5
+        })
+        #logger.add_scalar('test_acc', test_acc, epoch)
+        #logger.add_scalar('test_acc_top5', test_acc_top5, epoch)
+        #logger.add_scalar('test_loss', test_loss, epoch)
 
         # regular saving
         if epoch % opt.save_freq == 0:
