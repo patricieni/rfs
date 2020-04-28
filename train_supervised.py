@@ -28,7 +28,7 @@ from eval.cls_eval import validate
 
 def parse_option():
 
-    parent_dir = "/afs/inf.ed.ac.uk/user/s10/s1043702/RFS"
+    parent_dir = os.getcwd()
     parser = argparse.ArgumentParser('argument for training')
 
     parser.add_argument('--eval_freq',
@@ -195,6 +195,7 @@ def parse_option():
     opt.model_name = '{}_trial_{}'.format(opt.model_name, opt.trial)
 
     opt.tb_folder = os.path.join(parent_dir, opt.tb_path, opt.model_name)
+    print("Tensorboard folder: {0}".format(opt.tb_folder))
     if not os.path.isdir(opt.tb_folder):
         os.mkdir(opt.tb_folder)
 
@@ -211,7 +212,8 @@ def parse_option():
 def main():
 
     opt = parse_option()
-    parent_dir = "/afs/inf.ed.ac.uk/user/s10/s1043702/RFS"
+    parent_dir = os.getcwd()
+    print(parent_dir)
 
     # dataloader
     train_partition = 'trainval' if opt.use_trainval else 'train'
